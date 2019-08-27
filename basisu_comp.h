@@ -175,18 +175,18 @@ namespace basisu
 	struct basis_compressor_params
 	{
 		basis_compressor_params() :
+			m_pSel_codebook(NULL),
+			m_compression_level((int)BASISU_DEFAULT_COMPRESSION_LEVEL, 0, (int)BASISU_MAX_COMPRESSION_LEVEL),
+			m_selector_rdo_thresh(BASISU_DEFAULT_SELECTOR_RDO_THRESH, 0.0f, 1e+10f),
+			m_endpoint_rdo_thresh(BASISU_DEFAULT_ENDPOINT_RDO_THRESH, 0.0f, 1e+10f),
 			m_hybrid_sel_cb_quality_thresh(BASISU_DEFAULT_HYBRID_SEL_CB_QUALITY_THRESH, 0.0f, 1e+10f),
 			m_global_pal_bits(8, 0, ETC1_GLOBAL_SELECTOR_CODEBOOK_MAX_PAL_BITS),
 			m_global_mod_bits(8, 0, basist::etc1_global_palette_entry_modifier::cTotalBits),
-			m_endpoint_rdo_thresh(BASISU_DEFAULT_ENDPOINT_RDO_THRESH, 0.0f, 1e+10f),
-			m_selector_rdo_thresh(BASISU_DEFAULT_SELECTOR_RDO_THRESH, 0.0f, 1e+10f),
-			m_pSel_codebook(NULL),
+			m_mip_scale(1.0f, .000125f, 4.0f),
+			m_mip_smallest_dimension(1, 1, 16384),
 			m_max_endpoint_clusters(512),
 			m_max_selector_clusters(512),
 			m_quality_level(-1),
-			m_mip_scale(1.0f, .000125f, 4.0f),
-			m_mip_smallest_dimension(1, 1, 16384),
-			m_compression_level((int)BASISU_DEFAULT_COMPRESSION_LEVEL, 0, (int)BASISU_MAX_COMPRESSION_LEVEL),
 			m_pJob_pool(nullptr)
 		{
 			clear();

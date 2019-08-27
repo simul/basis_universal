@@ -24,10 +24,10 @@
 namespace basisu
 {
    basis_compressor::basis_compressor() :
-		m_total_blocks(0),
-		m_auto_global_sel_pal(false),
 		m_basis_file_size(0),
 		m_basis_bits_per_texel(0),
+		m_total_blocks(0),
+		m_auto_global_sel_pal(false),
 		m_any_source_image_has_alpha(false)
 	{
 		debug_printf("basis_compressor::basis_compressor\n");

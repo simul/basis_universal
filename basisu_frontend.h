@@ -73,15 +73,15 @@ namespace basisu
 				m_debug_stats(false),
 				m_debug_images(false),
 				m_dump_endpoint_clusterization(true),
+				m_validate(false),
+				m_multithreaded(false),
+				m_disable_hierarchical_endpoint_codebooks(false),
 				m_pGlobal_sel_codebook(NULL),
 				m_num_global_sel_codebook_pal_bits(0),
 				m_num_global_sel_codebook_mod_bits(0),
 				m_use_hybrid_selector_codebooks(false),
 				m_hybrid_codebook_quality_thresh(0.0f),
-				m_validate(false),
 				m_tex_type(basist::cBASISTexType2D),
-				m_multithreaded(false),
-				m_disable_hierarchical_endpoint_codebooks(false),
 				m_pJob_pool(nullptr)
 			{
 			}
