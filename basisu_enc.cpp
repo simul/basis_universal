@@ -283,7 +283,7 @@ namespace basisu
 #ifdef _WIN32
 		int64_t filesize = _ftelli64(pFile);
 #else
-		int64_t filesize = ftello(pFile);
+		int64_t filesize = ftell(pFile); //Was previously ftello() AJR
 #endif
 		if (filesize < 0)
 		{

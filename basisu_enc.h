@@ -1238,7 +1238,7 @@ namespace basisu
 
 		bool prep_split(const tsvq_node &node, TrainingVectorType &l_child_result, TrainingVectorType &r_child_result) const
 		{
-			const uint32_t N = TrainingVectorType::num_elements;
+			//const uint32_t N = TrainingVectorType::num_elements;
 
 			if (2 == node.m_training_vecs.size())
 			{
