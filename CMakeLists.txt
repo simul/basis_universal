@@ -63,6 +63,8 @@ else()
 	set(LIBRARIES_TO_LINK m pthread)
 endif()
 
+add_compile_definitions(BASISU_NO_ITERATOR_DEBUG_LEVEL)
+
 set(BASISU_SRC_LIST ${COMMON_SRC_LIST} 
 	basisu_backend.cpp
 	basisu_basis_file.cpp
