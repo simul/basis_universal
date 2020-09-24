@@ -99,9 +99,9 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>ispc_texcomp</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,11 +113,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
       <OpenMPSupport>true</OpenMPSupport>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -134,10 +133,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>ispc_texcomp</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -150,8 +147,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="apg_bmp.c" />
+    <ClCompile Include="basisu_astc_decomp.cpp" />
+    <ClCompile Include="basisu_bc7enc.cpp" />
     <ClCompile Include="basisu_ssim.cpp" />
+    <ClCompile Include="basisu_uastc_enc.cpp" />
+    <ClCompile Include="jpgd.cpp" />
     <ClCompile Include="transcoder\basisu_transcoder.cpp" />
+    <ClInclude Include="apg_bmp.h" />
+    <ClInclude Include="basisu_bc7enc.h" />
+    <ClInclude Include="basisu_astc_decomp.h" />
     <ClInclude Include="basisu_basis_file.h" />
     <ClInclude Include="basisu_comp.h" />
     <ClInclude Include="basisu_enc.h" />
@@ -166,6 +171,8 @@
     <ClCompile Include="basisu_resampler.cpp" />
     <ClCompile Include="basisu_resample_filters.cpp" />
     <ClInclude Include="basisu_ssim.h" />
+    <ClInclude Include="basisu_uastc_enc.h" />
+    <ClInclude Include="jpgd.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="transcoder\basisu.h" />
     <ClInclude Include="transcoder\basisu_transcoder.h" />
@@ -173,6 +180,7 @@
     <ClInclude Include="transcoder\basisu_file_headers.h" />
     <ClInclude Include="transcoder\basisu_global_selector_cb.h" />
     <ClInclude Include="transcoder\basisu_global_selector_palette.h" />
+    <ClInclude Include="transcoder\basisu_transcoder_uastc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="basisu_basis_file.cpp" />
@@ -188,7 +196,12 @@
     <ClCompile Include="basisu_tool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="transcoder\basisu_transcoder_tables_bc7_m6.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_astc.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_astc_0_255.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_atc_55.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_atc_56.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_bc7_m5_alpha.inc" />
+    <None Include="transcoder\basisu_transcoder_tables_bc7_m5_color.inc" />
     <None Include="transcoder\basisu_transcoder_tables_dxt1_5.inc" />
     <None Include="transcoder\basisu_transcoder_tables_dxt1_6.inc" />
   </ItemGroup>

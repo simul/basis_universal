@@ -1,5 +1,5 @@
 // basisu_frontend.h
-// Copyright (C) 2019 Binomial LLC. All Rights Reserved.
+// Copyright (C) 2019-2020 Binomial LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ namespace basisu
 				m_perceptual(true),
 				m_debug_stats(false),
 				m_debug_images(false),
+																
 				m_dump_endpoint_clusterization(true),
 				m_validate(false),
 				m_multithreaded(false),

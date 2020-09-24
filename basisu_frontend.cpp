@@ -1,5 +1,5 @@
 // basisu_frontend.cpp
-// Copyright (C) 2019 Binomial LLC. All Rights Reserved.
+// Copyright (C) 2019-2020 Binomial LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace basisu
 	const uint32_t cMaxCodebookCreationThreads = 8;
 
 	const uint32_t BASISU_MAX_ENDPOINT_REFINEMENT_STEPS = 3;
-	const uint32_t BASISU_MAX_SELECTOR_REFINEMENT_STEPS = 3;
+	//const uint32_t BASISU_MAX_SELECTOR_REFINEMENT_STEPS = 3;
 
 	const uint32_t BASISU_ENDPOINT_PARENT_CODEBOOK_SIZE = 16;
 	const uint32_t BASISU_SELECTOR_PARENT_CODEBOOK_SIZE = 16;
@@ -343,6 +343,7 @@ namespace basisu
 				cur_blk.set_block_color5_etc1s(get_endpoint_cluster_unscaled_color(endpoint_cluster_index, false));
 				cur_blk.set_inten_tables_etc1s(get_endpoint_cluster_inten_table(endpoint_cluster_index, false));
 				cur_blk.set_raw_selector_bits(get_selector_cluster_selector_bits(old_selector_cluster_index).get_raw_selector_bits());
+				cur_blk.set_flip_bit(true);
 
 				const uint64_t cur_err = cur_blk.evaluate_etc1_error(get_source_pixel_block(block_index).get_ptr(), m_params.m_perceptual);
 
@@ -836,7 +837,7 @@ namespace basisu
 				continue;
 #endif
 
-			const uint32_t new_endpoint_cluster_index = (uint32_t)m_endpoint_clusters.size();
+			//const uint32_t new_endpoint_cluster_index = (uint32_t)m_endpoint_clusters.size();
 
 			enlarge_vector(m_endpoint_clusters, 1)->push_back(training_vector_index);
 			enlarge_vector(m_endpoint_cluster_etc_params, 1);
@@ -1084,7 +1085,7 @@ namespace basisu
 
 				for (uint32_t block_index = first_index; block_index < last_index; block_index++)
 				{
-					const bool is_flipped = true;
+					//const bool is_flipped = true;
 			
 					const uint32_t cluster_index = block_clusters[block_index][0];
 					BASISU_FRONTEND_VERIFY(cluster_index == block_clusters[block_index][1]);
@@ -1937,7 +1938,7 @@ namespace basisu
 
 						const uint32_t block_index = training_vector_index >> 1;
 						const uint32_t subblock_index = training_vector_index & 1;
-						const bool is_flipped = true;
+						//const bool is_flipped = true;
 
 						etc_block &blk = m_encoded_blocks[block_index];
 
@@ -2385,7 +2386,7 @@ namespace basisu
 	void basisu_frontend::dump_debug_image(const char *pFilename, uint32_t first_block, uint32_t num_blocks_x, uint32_t num_blocks_y, bool output_blocks)
 	{
 		gpu_image g;
-		g.init(cETC1, num_blocks_x * 4, num_blocks_y * 4);
+		g.init(texture_format::cETC1, num_blocks_x * 4, num_blocks_y * 4);
 
 		for (uint32_t y = 0; y < num_blocks_y; y++)
 		{
