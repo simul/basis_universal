@@ -4,13 +4,17 @@ cmake_minimum_required(VERSION 3.0)
 option(BUILD_X64 "build 64-bit" TRUE)
 option(STATIC "static linking" TRUE)
 option(BUILD_AS_LIBRARY "build as a library instead of executable" FALSE)
+option(SSE "SSE 4.1 support" FALSE)
+option(ZSTD "ZSTD support for KTX2 transcoding/encoding" TRUE)
 
 message("Initial BUILD_X64=${BUILD_X64}")
 message("Initial CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+message("Initial SSE=${SSE}")
+message("Initial ZSTD=${ZSTD}")
 
 if( NOT CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE Release )
-endif( NOT CMAKE_BUILD_TYPE )
+endif()
 
 message( ${PROJECT_NAME} " build type: " ${CMAKE_BUILD_TYPE} )
 
@@ -18,7 +22,19 @@ if (BUILD_X64)
 	message("Building 64-bit")
 else()
 	message("Building 32-bit")
-endif(BUILD_X64)
+endif()
+
+if (SSE)
+	message("SSE enabled")
+else()
+	message("SSE disabled")
+endif()
+
+if (ZSTD)
+	message("Zstandard enabled")
+else()
+	message("Zstandard disabled")
+endif()
 
 if (NOT MSVC)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -35,17 +51,33 @@ if (NOT MSVC)
 	endif()
 
    if (EMSCRIPTEN)
-	  set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
-	  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
+	  set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -DBASISU_SUPPORT_SSE=0")
+	  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -DBASISU_SUPPORT_SSE=0")
  
 	  set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
 	elseif (STATIC)
+      if (SSE)
+		set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=1 -msse4.1")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=1 -msse4.1")
+	  else()
+	  	set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=0")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=0")
+	  endif()
+	  
 		set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS} -static-libgcc -static-libstdc++ -static")
 	else()
+   	  if (SSE)
+		set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=1 -msse4.1")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=1 -msse4.1")
+	  else()
+	  	set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=0")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=0")
+	  endif()
+	  
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 		set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 		set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS} -Wl,-rpath .")
-	endif(STATIC)
+   endif()
 
 	set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${GCC_COMPILE_FLAGS}")
 	set(CMAKE_C_FLAGS_RELEASE  "${CMAKE_C_FLAGS_RELEASE} ${GCC_COMPILE_FLAGS}")
@@ -54,43 +86,54 @@ if (NOT MSVC)
 	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
 	set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} ${GCC_COMPILE_FLAGS}")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_COMPILE_FLAGS} -D_DEBUG")
-elseif (STATIC)
-		if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
-		  # using Visual Studio C++
+	
+	set(LIBRARIES_TO_LINK m pthread)
+	set( CMAKE_CXX_FLAGS_DEBUG "/MDd /Zi /Ob0 /Od /RTC1" )
+	set( CMAKE_CXX_FLAGS_RELEASE "/MD /O2 /Ob2 /DNDEBUG" )
+else()
+	if (SSE)
+		set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=1")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=1")
+	else()
+		set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -DBASISU_SUPPORT_SSE=0")
+		set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DBASISU_SUPPORT_SSE=0")
+	endif()
+	if (STATIC)
 			set(LIBRARIES_TO_LINK "")
 			set( CMAKE_CXX_FLAGS_DEBUG "/MTd /Zi /Ob0 /Od /RTC1" )
 			set( CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /DNDEBUG" )
-		else()
-			set(LIBRARIES_TO_LINK m pthread)
-			set( CMAKE_CXX_FLAGS_DEBUG "/MDd /Zi /Ob0 /Od /RTC1" )
-			set( CMAKE_CXX_FLAGS_RELEASE "/MD /O2 /Ob2 /DNDEBUG" )
-		endif()
+	endif()
 endif()
 
 add_compile_definitions(BASISU_NO_ITERATOR_DEBUG_LEVEL)
 
 set(BASISU_SRC_LIST ${COMMON_SRC_LIST} 
-	basisu_backend.cpp
-	basisu_basis_file.cpp
-	basisu_comp.cpp
-	basisu_enc.cpp
-	basisu_etc.cpp
-	basisu_frontend.cpp
-	basisu_global_selector_palette_helpers.cpp
-	basisu_gpu_texture.cpp
-	basisu_pvrtc1_4.cpp
-	basisu_resampler.cpp
-	basisu_resample_filters.cpp
-	basisu_ssim.cpp
 	basisu_tool.cpp
-	basisu_astc_decomp.cpp
-	basisu_uastc_enc.cpp
-	basisu_bc7enc.cpp
-	lodepng.cpp
-	apg_bmp.c
-	jpgd.cpp
+	encoder/basisu_backend.cpp
+	encoder/basisu_basis_file.cpp
+	encoder/basisu_comp.cpp
+	encoder/basisu_enc.cpp
+	encoder/basisu_etc.cpp
+	encoder/basisu_frontend.cpp
+	encoder/basisu_global_selector_palette_helpers.cpp
+	encoder/basisu_gpu_texture.cpp
+	encoder/basisu_pvrtc1_4.cpp
+	encoder/basisu_resampler.cpp
+	encoder/basisu_resample_filters.cpp
+	encoder/basisu_ssim.cpp
+	encoder/basisu_astc_decomp.cpp
+	encoder/basisu_uastc_enc.cpp
+	encoder/basisu_bc7enc.cpp
+	encoder/lodepng.cpp
+	encoder/apg_bmp.c
+	encoder/jpgd.cpp
+	encoder/basisu_kernels_sse.cpp
 	transcoder/basisu_transcoder.cpp
 	)
+
+if (ZSTD)
+	set(BASISU_SRC_LIST ${BASISU_SRC_LIST} zstd/zstd.c)
+endif()
 
 if (APPLE)
 	set(BIN_DIRECTORY "bin_osx")
@@ -107,7 +150,17 @@ if (${BUILD_AS_LIBRARY})
 		add_library(basisu ${BASISU_SRC_LIST})
 	endif()
 else()
-add_executable(basisu ${BASISU_SRC_LIST})
+	add_executable(basisu ${BASISU_SRC_LIST})
+endif()
+
+if (ZSTD)
+	target_compile_definitions(basisu PRIVATE BASISD_SUPPORT_KTX2_ZSTD=1)
+else()
+	target_compile_definitions(basisu PRIVATE BASISD_SUPPORT_KTX2_ZSTD=0)
+endif()
+
+if (NOT MSVC)
+   target_link_libraries(basisu m pthread)
 endif()
 target_link_libraries(basisu ${LIBRARIES_TO_LINK} )
 
@@ -118,11 +171,11 @@ install(TARGETS basisu DESTINATION bin)
 	if (UNIX)
 if (CMAKE_BUILD_TYPE STREQUAL Release)
     if (APPLE)
-				add_custom_command(TARGET basisu POST_BUILD COMMAND strip -X -x ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/basisu)
+		add_custom_command(TARGET basisu POST_BUILD COMMAND strip -X -x ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/basisu)
     elseif(UNIX)
         add_custom_command(TARGET basisu POST_BUILD COMMAND strip -g -X -x ${CMAKE_SOURCE_DIR}/${BIN_DIRECTORY}/basisu)
-			else()
-				add_custom_command(TARGET basisu POST_BUILD COMMAND strip -g -X -x ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/basisu)
+	else()
+		add_custom_command(TARGET basisu POST_BUILD COMMAND strip -g -X -x ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/basisu)
     endif()
 endif()
 	endif()
