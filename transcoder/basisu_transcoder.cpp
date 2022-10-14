@@ -173,10 +173,13 @@ namespace basisu
 			va_list args;
 			va_start(args, pFmt);
 			char txt[1000];
-			vsprintf(txt,pFmt, args);
 #ifdef _MSC_VER
+			vsprintf_s(txt,1000,pFmt, args);
 			OutputDebugString (txt);
+			#else
+			vsprintf(txt,pFmt, args);
 #endif
+
 			
 			va_end(args);
 		}
